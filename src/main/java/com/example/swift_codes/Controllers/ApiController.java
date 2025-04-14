@@ -1,13 +1,11 @@
 package com.example.swift_codes.Controllers;
 
-import com.example.swift_codes.Models.BankAddress;
+import com.example.swift_codes.Models.Country;
 import com.example.swift_codes.Models.SwiftCode;
 import com.example.swift_codes.Repos.*;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -64,6 +62,30 @@ public class ApiController
                     .put("swiftCode", b.getSwiftCode()
             ));
         }
+
+        return ResponseEntity.ok(response.toString());
+    }
+
+    @GetMapping(value = "/v1/swift-codes/country/{countryISO2code}")
+    public ResponseEntity<String> getSwiftCodesForCountry(@PathVariable("countryISO2code") String countryISO2)
+    {
+        Country countryRecord = countryRepo.findByCountryCode(countryISO2)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "SWIFT code not found"));
+
+        ObjectNode response = JsonNodeFactory.instance.objectNode()
+                .put("countryISO2", countryISO2)
+                .put("countryName", countryRecord.getCountryName());
+
+        ArrayNode swiftCodesArray = response.putArray("swiftCodes");
+
+        List<SwiftCode> swiftCodes = swiftCodeRepo.getByCountryCodes(countryISO2);
+        swiftCodes.forEach(s -> swiftCodesArray.addObject()
+                .put("address", s.getBankAddress().getAddress())
+                .put("bankName", s.getBankName().getBankName())
+                .put("countryISO2", s.getCountry().getCountryCode())
+                .put("isHeadquarter", s.getIsHeadquarters())
+                .put("swiftCode", s.getSwiftCode())
+        );
 
         return ResponseEntity.ok(response.toString());
     }

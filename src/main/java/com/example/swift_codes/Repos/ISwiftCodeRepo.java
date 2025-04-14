@@ -16,4 +16,9 @@ public interface ISwiftCodeRepo extends JpaRepository<SwiftCode, Long>
             "WHERE SUBSTRING(sc.swiftCode, 1, 8) = SUBSTRING(:code, 1, 8) " +
             "AND sc.swiftCode <> :code")
     List<SwiftCode> getBankBranches(@Param("code") String code);
+
+    @Query("SELECT sc FROM SwiftCode sc " +
+            "JOIN sc.country c " +
+            "WHERE c.countryCode = :countryCode")
+    List<SwiftCode> getByCountryCodes(@Param("countryCode") String countryCode);
 }
