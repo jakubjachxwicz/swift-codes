@@ -8,10 +8,10 @@ public class SwiftCode {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long swiftCodeID;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 11)
     private String swiftCode;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10)
     private String codeType;
 
     @Column(nullable = false)

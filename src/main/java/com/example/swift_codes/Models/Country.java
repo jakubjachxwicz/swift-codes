@@ -8,13 +8,13 @@ public class Country {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long countryID;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true, length = 2)
     private String countryCode;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true, length = 64)
     private String countryName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 64)
     private String timeZone;
 
 
