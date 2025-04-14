@@ -1,19 +1,22 @@
 package com.example.swift_codes.Controllers;
 
+import com.example.swift_codes.Models.BankAddress;
+import com.example.swift_codes.Models.BankName;
 import com.example.swift_codes.Models.Country;
 import com.example.swift_codes.Models.SwiftCode;
 import com.example.swift_codes.Repos.*;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class ApiController
@@ -88,5 +91,42 @@ public class ApiController
         );
 
         return ResponseEntity.ok(response.toString());
+    }
+
+    @PostMapping(value = "/v1/swift-codes")
+    public ResponseEntity<Map<String, String>> addNewCode(@RequestBody Map<String, Object> requestBody)
+    {
+        String address = (String)requestBody.get("address");
+        String bankName = (String)requestBody.get("bankName");
+        String countryISO2 = (String)requestBody.get("countryISO2");
+        String countryName = (String)requestBody.get("countryName");
+        boolean isHeadquarter = (boolean)requestBody.get("isHeadquarter");
+        String swiftCode = (String)requestBody.get("swiftCode");
+
+        BankAddress bankAddress = ControllerHelpers.getOrCreateAddress(bankAddressRepo, address, "");
+        BankName bName = ControllerHelpers.getOrCreateBankName(bankNameRepo, bankName);
+        Country country = ControllerHelpers.getOrCreateCountry(countryRepo, countryISO2, countryName, "");
+
+        SwiftCode swiftCodeRecord = new SwiftCode();
+        swiftCodeRecord.setSwiftCode(swiftCode);
+        swiftCodeRecord.setCountry(country);
+        swiftCodeRecord.setHeadquarters(isHeadquarter);
+        swiftCodeRecord.setBankAddress(bankAddress);
+        swiftCodeRecord.setBankName(bName);
+        swiftCodeRecord.setCodeType("BIC11");
+
+        swiftCodeRepo.save(swiftCodeRecord);
+
+        return ResponseEntity.ok(Collections.singletonMap("message", "Swift code added to the database"));
+    }
+
+    @DeleteMapping(value = "/v1/swift-codes/{swift-code}")
+    @Transactional
+    public ResponseEntity<Map<String, String>> deleteSwiftCode(@PathVariable("swift-code") String code)
+    {
+        swiftCodeRepo.deleteBySwiftCode(code);
+
+
+        return ResponseEntity.ok(Collections.singletonMap("message", "Swift code deleted from the database"));
     }
 }

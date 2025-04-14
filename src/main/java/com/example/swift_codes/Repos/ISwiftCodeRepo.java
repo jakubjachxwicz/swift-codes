@@ -21,4 +21,6 @@ public interface ISwiftCodeRepo extends JpaRepository<SwiftCode, Long>
             "JOIN sc.country c " +
             "WHERE c.countryCode = :countryCode")
     List<SwiftCode> getByCountryCodes(@Param("countryCode") String countryCode);
+
+    void deleteBySwiftCode(String swiftCode);
 }

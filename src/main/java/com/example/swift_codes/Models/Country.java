@@ -14,7 +14,7 @@ public class Country {
     @Column(nullable = false, unique = true, length = 64)
     private String countryName;
 
-    @Column(nullable = false, length = 64)
+    @Column(length = 64)
     private String timeZone;
 
 

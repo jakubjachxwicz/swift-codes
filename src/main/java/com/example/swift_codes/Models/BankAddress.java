@@ -11,7 +11,7 @@ public class BankAddress {
     @Column(nullable = true, unique = true)
     private String address;
 
-    @Column(nullable = false)
+    @Column()
     private String townName;
 
 

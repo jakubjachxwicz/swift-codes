@@ -63,9 +63,9 @@ public class LoadDataController
                 String countryName = record[6];
                 String timeZone = record[7];
 
-                Country country = getOrCreateCountry(countryCode, countryName, timeZone);
-                BankName bankName = getOrCreateBankName(name);
-                BankAddress bankAddress = getOrCreateAddress(address, townName);
+                Country country = ControllerHelpers.getOrCreateCountry(countryRepo, countryCode, countryName, timeZone);
+                BankName bankName = ControllerHelpers.getOrCreateBankName(bankNameRepo, name);
+                BankAddress bankAddress = ControllerHelpers.getOrCreateAddress(bankAddressRepo, address, townName);
 
                 SwiftCode swiftCodeRecord = new SwiftCode();
                 swiftCodeRecord.setSwiftCode(swiftCode);
@@ -82,38 +82,5 @@ public class LoadDataController
         }
 
         return filename;
-    }
-
-    private Country getOrCreateCountry(String code, String name, String timeZone)
-    {
-        return countryRepo.findByCountryCode(code).orElseGet(() -> {
-            Country country = new Country();
-            country.setCountryCode(code);
-            country.setCountryName(name);
-            country.setTimeZone(timeZone);
-
-            return countryRepo.save(country);
-        });
-    }
-
-    private BankName getOrCreateBankName(String name)
-    {
-        return bankNameRepo.findByBankName(name).orElseGet(() -> {
-            BankName bankName = new BankName();
-            bankName.setBankName(name);
-
-            return bankNameRepo.save(bankName);
-        });
-    }
-
-    private BankAddress getOrCreateAddress(String address, String townName)
-    {
-        return bankAddressRepo.findByAddress(address).orElseGet(() -> {
-           BankAddress bankAddress = new BankAddress();
-           bankAddress.setAddress(address);
-           bankAddress.setTownName(townName);
-
-           return bankAddressRepo.save(bankAddress);
-        });
     }
 }
