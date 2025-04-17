@@ -18,6 +18,8 @@ public interface ISwiftCodeRepo extends JpaRepository<SwiftCode, Long>
             "AND sc.swiftCode <> :code")
     List<SwiftCode> getBankBranches(@Param("code") String code);
 
+    boolean existsBySwiftCode(String swiftCode);
+
     @Query("SELECT sc FROM SwiftCode sc " +
             "JOIN sc.country c " +
             "WHERE c.countryCode = :countryCode")
@@ -28,4 +30,16 @@ public interface ISwiftCodeRepo extends JpaRepository<SwiftCode, Long>
     @Modifying
     @Query("DELETE FROM SwiftCode")
     void deleteAll();
+
+    @Modifying
+    @Query("DELETE FROM BankAddress ba WHERE NOT EXISTS (SELECT 1 FROM SwiftCode sc WHERE sc.bankAddress = ba)")
+    void deleteOrphanedAddresses();
+
+    @Modifying
+    @Query("DELETE FROM BankName bn WHERE NOT EXISTS (SELECT 1 FROM SwiftCode sc WHERE sc.bankName = bn)")
+    void deleteOrphanedNames();
+
+    @Modifying
+    @Query("DELETE FROM Country c WHERE NOT EXISTS (SELECT 1 FROM SwiftCode sc WHERE sc.country = c)")
+    void deleteOrphanedCountries();
 }

@@ -71,4 +71,20 @@ public class ControllerHelpers
 
         return true;
     }
+
+    public static boolean validateNewRecord(String address, String bankName, String ISO2, String countryName, String swiftCode)
+    {
+        if (!bankAddressPattern.matcher(address).matches())
+            return false;
+        if (!bankNamePattern.matcher(bankName).matches())
+            return false;
+        if (!countryCodePattern.matcher(ISO2).matches())
+            return false;
+        if (!countryNamePattern.matcher(countryName).matches())
+            return false;
+        if (!swiftCodePattern.matcher(swiftCode).matches())
+            return false;
+
+        return true;
+    }
 }

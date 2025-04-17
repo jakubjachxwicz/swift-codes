@@ -46,12 +46,12 @@ public class LoadDataController
     {
         if (filename == null || filename.trim().isEmpty())
         {
-            return ResponseEntity.badRequest().body(Collections.singletonMap("message", "Filename cannot be empty"));
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Filename cannot be empty"));
         }
 
         if (filename.contains("..") || filename.contains("/") || filename.contains("\\"))
         {
-            return ResponseEntity.badRequest().body(Collections.singletonMap("message", "Filepath is invalid"));
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Filepath is invalid"));
         }
 
         swiftCodeRepo.deleteAll();
@@ -83,12 +83,12 @@ public class LoadDataController
 
                 if (record.length != 8)
                 {
-                    return ResponseEntity.badRequest().body(Collections.singletonMap("message", "Problem with a structure of a file in line " + line));
+                    return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Problem with a structure of a file in line " + line));
                 }
 
                 if (!ControllerHelpers.validateIpnutLine(record))
                 {
-                    return ResponseEntity.badRequest().body(Collections.singletonMap("message", "Problem during validating data in line " + line));
+                    return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Problem during validating data in line " + line));
                 }
 
                 String countryCode = record[0];
@@ -115,7 +115,7 @@ public class LoadDataController
                 swiftCodeRepo.save(swiftCodeRecord);
             }
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(Collections.singletonMap("message", "Unexpected error: " + e.getMessage()));
+            return ResponseEntity.internalServerError().body(Collections.singletonMap("error", "Unexpected error: " + e.getMessage()));
         }
         finally {
             if (csvReader != null)
