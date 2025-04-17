@@ -2,6 +2,7 @@ package com.example.swift_codes.Repos;
 
 import com.example.swift_codes.Models.SwiftCode;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -23,4 +24,8 @@ public interface ISwiftCodeRepo extends JpaRepository<SwiftCode, Long>
     List<SwiftCode> getByCountryCodes(@Param("countryCode") String countryCode);
 
     void deleteBySwiftCode(String swiftCode);
+
+    @Modifying
+    @Query("DELETE FROM SwiftCode")
+    void deleteAll();
 }
