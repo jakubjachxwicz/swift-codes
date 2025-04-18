@@ -86,5 +86,23 @@ public class ControllerHelpers
             return false;
 
         return true;
+
+//        boolean reg1 = bankAddressPattern.matcher(address).matches();
+//        boolean reg2 = bankNamePattern.matcher(bankName).matches();
+//        boolean reg3 = bankNamePattern.matcher(bankName).matches();
+//        boolean reg4 = countryNamePattern.matcher(countryName).matches();
+//        boolean reg5 = swiftCodePattern.matcher(swiftCode).matches();
+//
+//        System.out.println("address match: " + bankAddressPattern.matcher(address).matches());
+//        System.out.println("bankName match: " + bankNamePattern.matcher(bankName).matches());
+//        System.out.println("ISO2 match: " + bankNamePattern.matcher(bankName).matches());
+//        System.out.println("countryName match: " + countryNamePattern.matcher(countryName).matches());
+//        System.out.println("swiftCode match: " + swiftCodePattern.matcher(swiftCode).matches());
+//
+//        return bankAddressPattern.matcher(address).matches()
+//                && bankNamePattern.matcher(bankName).matches()
+//                && countryCodePattern.matcher(ISO2).matches()
+//                && countryNamePattern.matcher(countryName).matches()
+//                && swiftCodePattern.matcher(swiftCode).matches();
     }
 }

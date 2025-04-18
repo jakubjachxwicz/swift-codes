@@ -50,9 +50,11 @@ public class ApiController
                 return ResponseEntity.badRequest().body("{ \"error\": \"SWIFT code is empty\"}");
             }
 
-            SwiftCode swiftCodeRecord = swiftCodeRepo.findBySwiftCode(code)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                            "{ \"error\": \"SWIFT code not found\"}"));
+            SwiftCode swiftCodeRecord = swiftCodeRepo.findBySwiftCode(code).orElse(null);
+            if (swiftCodeRecord == null)
+            {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{ \"error\": \"SWIFT code not found\"}");
+            }
 
             if (swiftCodeRecord.getBankName() == null
                     || swiftCodeRecord.getBankAddress() == null
@@ -93,7 +95,8 @@ public class ApiController
             }
 
             return ResponseEntity.ok(response.toString());
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{ \"error\": \""
                     + "Unexpected error: " + e.getMessage() + "\"}");
@@ -110,9 +113,11 @@ public class ApiController
                 return ResponseEntity.badRequest().body("{ \"error\": \"countryISO2 is empty\"}");
             }
 
-            Country countryRecord = countryRepo.findByCountryCode(countryISO2)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                            "{ \"error\": \"SWIFT code not found\"}"));
+            Country countryRecord = countryRepo.findByCountryCode(countryISO2).orElse(null);
+            if (countryRecord == null)
+            {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{ \"error\": \"Country not found\"}");
+            }
 
             ObjectNode response = JsonNodeFactory.instance.objectNode()
                     .put("countryISO2", countryISO2)
@@ -123,9 +128,7 @@ public class ApiController
             List<SwiftCode> swiftCodes = swiftCodeRepo.getByCountryCodes(countryISO2);
             for (var swiftCode : swiftCodes)
             {
-                if (swiftCode.getBankName() == null
-                        || swiftCode.getBankAddress() == null
-                        || swiftCode.getCountry() == null)
+                if (swiftCode.getBankName() == null || swiftCode.getBankAddress() == null)
                 {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{ \"error\": \"Missing associated SWIFT code data\"}");
                 }
