@@ -7,6 +7,7 @@ import com.example.swift_codes.Models.Country;
 import com.example.swift_codes.Models.SwiftCode;
 import com.example.swift_codes.Repos.ICountryRepo;
 import com.example.swift_codes.Repos.ISwiftCodeRepo;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,6 +15,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +26,8 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
+@Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class GetSwiftCodesForCountryTests
 {
     @InjectMocks
@@ -33,6 +38,13 @@ public class GetSwiftCodesForCountryTests
 
     @Mock
     private ISwiftCodeRepo swiftCodeRepo;
+
+    @BeforeEach
+    void cleanDb()
+    {
+        swiftCodeRepo.deleteAll();
+        countryRepo.deleteAll();
+    }
 
 
     @Test

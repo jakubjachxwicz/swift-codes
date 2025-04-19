@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +21,7 @@ import static org.springframework.test.util.AssertionErrors.assertTrue;
 @DataJpaTest
 @EntityScan("com.example.swift_codes.Models")
 @EnableJpaRepositories("com.example.swift_codes.Repos")
+@Transactional
 public class ISwiftCodeRepoTests
 {
     @Autowired

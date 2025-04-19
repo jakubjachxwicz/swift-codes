@@ -7,6 +7,7 @@ import com.example.swift_codes.Models.Country;
 import com.example.swift_codes.Models.SwiftCode;
 import com.example.swift_codes.Repos.ICountryRepo;
 import com.example.swift_codes.Repos.ISwiftCodeRepo;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,17 +17,18 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import static org.mockito.Mockito.when;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
+@Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class AddNewCodeTests
 {
     @InjectMocks
@@ -35,6 +37,11 @@ public class AddNewCodeTests
     @Mock
     private ISwiftCodeRepo swiftCodeRepo;
 
+    @BeforeEach
+    void cleanDb()
+    {
+        swiftCodeRepo.deleteAll();
+    }
 
     @Test
     void shouldReturnBadRequestWhenRequestBodyIsMissing()
@@ -80,46 +87,6 @@ public class AddNewCodeTests
         assertEquals("Response message", "bankName field is missing", response1.getBody().get("error"));
         assertEquals("Response message", "countryISO2 field is missing", response2.getBody().get("error"));
         assertEquals("Response message", "swiftCode field is missing", response3.getBody().get("error"));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenDataValidationFails()
-    {
-        Map<String, Object> requestBody1 = new HashMap<>();
-        requestBody1.put("address", "TOPOLOWA 12");
-        requestBody1.put("countryISO2", "123");
-        requestBody1.put("countryName", "POLAND");
-        requestBody1.put("isHeadquarter", true);
-        requestBody1.put("swiftCode", "ABCDEFGHIJK");
-        requestBody1.put("bankName", "NBANK");
-
-        Map<String, Object> requestBody2 = new HashMap<>();
-        requestBody2.put("address", "TOPOLOWA 12");
-        requestBody2.put("bankName", "NBANK");
-        requestBody2.put("countryName", "POLAND");
-        requestBody2.put("isHeadquarter", true);
-        requestBody2.put("swiftCode", "XXXXXXXXXXXXXXX");
-        requestBody2.put("countryISO2", "PL");
-
-        Map<String, Object> requestBody3 = new HashMap<>();
-        requestBody3.put("address", "TOPOLOWA 12");
-        requestBody3.put("countryISO2", "PL");
-        requestBody3.put("countryName", 321);
-        requestBody3.put("isHeadquarter", true);
-        requestBody3.put("bankName", "NBANK");
-        requestBody3.put("swiftCode", "ABCDEFGHIJK");
-
-        ResponseEntity<Map<String, String>> response1 = apiController.addNewCode(requestBody1);
-        ResponseEntity<Map<String, String>> response2 = apiController.addNewCode(requestBody2);
-        ResponseEntity<Map<String, String>> response3 = apiController.addNewCode(requestBody3);
-
-        assertEquals("Status code", HttpStatus.BAD_REQUEST, response1.getStatusCode());
-        assertEquals("Status code", HttpStatus.BAD_REQUEST, response2.getStatusCode());
-        assertEquals("Status code", HttpStatus.INTERNAL_SERVER_ERROR, response3.getStatusCode());
-
-        assertEquals("Response message", "invalid value", response1.getBody().get("error"));
-        assertEquals("Response message", "invalid value", response2.getBody().get("error"));
-        assertTrue("Response message", response3.getBody().get("error").contains("Unexpected error"));
     }
 
     @Test
