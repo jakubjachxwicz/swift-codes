@@ -8,25 +8,20 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
+@Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class LoadDataControllerTests
 {
     @InjectMocks
     private LoadDataController loadDataController;
-
-    @Mock
-    private ISwiftCodeRepo swiftCodeRepo;
-    @Mock
-    private ICountryRepo countryRepo;
-    @Mock
-    private IBankNameRepo bankNameRepo;
-    @Mock
-    private IBankAddressRepo bankCodeRepo;
 
 
     @Test

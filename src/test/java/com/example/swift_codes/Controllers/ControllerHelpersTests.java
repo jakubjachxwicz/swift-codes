@@ -7,10 +7,13 @@ import com.example.swift_codes.Models.Country;
 import com.example.swift_codes.Repos.IBankAddressRepo;
 import com.example.swift_codes.Repos.IBankNameRepo;
 import com.example.swift_codes.Repos.ICountryRepo;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -21,6 +24,8 @@ import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 
 @ExtendWith(MockitoExtension.class)
+@Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ControllerHelpersTests
 {
     @Mock
@@ -30,6 +35,14 @@ public class ControllerHelpersTests
     @Mock
     private IBankNameRepo bankNameRepo;
 
+
+    @BeforeEach
+    void cleanDb()
+    {
+        countryRepo.deleteAll();
+        bankNameRepo.deleteAll();
+        bankAddressRepo.deleteAll();
+    }
 
     @Test
     void shouldReturnFalseIfInputsAreInvalid()
