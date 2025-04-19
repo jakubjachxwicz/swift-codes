@@ -10,12 +10,16 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 public class LoadDataController
@@ -38,14 +42,35 @@ public class LoadDataController
 
 
     @PostMapping(value = "/admin/parse-data")
-    public String parseData(@RequestParam String filename)
+    public ResponseEntity<Map<String, String>> parseData(@RequestParam String filename)
     {
-        CSVReader csvReader;
+        if (filename == null || filename.trim().isEmpty())
+        {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Filename cannot be empty"));
+        }
+
+        if (filename.contains("..") || filename.contains("/") || filename.contains("\\"))
+        {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Filepath is invalid"));
+        }
+
+        swiftCodeRepo.deleteAll();
+        countryRepo.deleteAll();
+        bankAddressRepo.deleteAll();
+        bankNameRepo.deleteAll();
+
+        CSVReader csvReader = null;
         String[] record;
+        int line = 0;
 
         try
         {
             ClassPathResource resource = new ClassPathResource(filename);
+
+            if (!resource.exists())
+            {
+                return ResponseEntity.notFound().build();
+            }
 
             csvReader = new CSVReaderBuilder(new InputStreamReader(resource.getInputStream()))
                     .withCSVParser(new CSVParserBuilder().build())
@@ -54,6 +79,18 @@ public class LoadDataController
 
             while ((record = csvReader.readNext()) != null)
             {
+                line++;
+
+                if (record.length != 8)
+                {
+                    return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Problem with a structure of a file in line " + line));
+                }
+
+                if (!ControllerHelpers.validateIpnutLine(record))
+                {
+                    return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Problem during validating data in line " + line));
+                }
+
                 String countryCode = record[0];
                 String swiftCode = record[1];
                 String codeType = record[2];
@@ -77,10 +114,20 @@ public class LoadDataController
 
                 swiftCodeRepo.save(swiftCodeRecord);
             }
-        } catch (CsvValidationException | IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Collections.singletonMap("error", "Unexpected error: " + e.getMessage()));
+        }
+        finally {
+            if (csvReader != null)
+            {
+                try {
+                    csvReader.close();
+                } catch (IOException e) {
+                    System.out.println("Error closing CSV reader: " + e.getMessage());
+                }
+            }
         }
 
-        return filename;
+        return ResponseEntity.ok(Collections.singletonMap("message", "Data successfully added to the database"));
     }
 }

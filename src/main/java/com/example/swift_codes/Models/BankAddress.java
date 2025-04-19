@@ -8,7 +8,7 @@ public class BankAddress {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long addressID;
 
-    @Column(nullable = true, unique = true)
+    @Column(unique = true)
     private String address;
 
     @Column()
